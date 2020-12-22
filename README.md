@@ -388,7 +388,7 @@ encoded token client-side.
 
   Head on over to [jwt.io](http://jwt.io/#debugger) and see for yourself:
 
-  <img width="750" alt="JWTs" src="https://cloud.githubusercontent.com/assets/25366/9151601/2e3baf1a-3dbc-11e5-90f6-b22cda07a077.png">
+  <img width="750" alt="JWTs" src="https://cloud.githubusercontent.com/assets/25366/9151601/2e3baf1a-3dbc-11e5-90f6-b22cda07a077.png" />
 
 ---
 
