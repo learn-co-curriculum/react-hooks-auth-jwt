@@ -345,7 +345,7 @@ remember to use double quotes ("") in both keys and values in the request.
 
 ---
 
-# Make Sure You Can POST and Create a New User Before Proceeding
+**Make Sure You Can POST and Create a New User Before Proceeding**
 
 ![intermission](https://media.giphy.com/media/pcPs6v6fhE7Ru/giphy.gif)
 
