@@ -936,17 +936,18 @@ We'll use this to display a Google sign in button and handle logic for
 authenticating the user with Google. Update the `<Login>` component like this:
 
 ```jsx
-import React from "react";
+import React, { useState } from "react";
 import { GoogleLogin } from "react-google-login";
 
-class Login extends React.Component {
-  state = {
+class Login({ handleLogin }) {
+  const [formData, setFormData] = useState({
     username: "",
     password: "",
-  };
+  });
+  
 
   // new code!
-  handleGoogleLogin = (response) => {
+  const handleGoogleLogin = (response) => {
     // we'll get a tokenId back from Google on successful login that we'll send to our server to find/create a user
     if (response.tokenId) {
       fetch("http://localhost:3000/google_login", {
@@ -961,7 +962,7 @@ class Login extends React.Component {
           console.log(data);
           const { user, token } = data;
           // then set that user in state in our App component
-          this.props.handleLogin(user);
+          handleLogin(user);
           // also save the id to localStorage
           localStorage.token = token;
         });
@@ -969,12 +970,12 @@ class Login extends React.Component {
   };
 
   // old code
-  handleChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setFormData({...formData, [e.target.name]: e.target.value });
   };
 
   // old code
-  handleSubmit = (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     fetch("http://localhost:3000/login", {
       method: "POST",
@@ -988,7 +989,7 @@ class Login extends React.Component {
         console.log(data);
         const { user, token } = data;
         // then set that user in state in our App component
-        this.props.handleLogin(user);
+        handleLogin(user);
         // also save the id to localStorage
         localStorage.token = token;
       });
@@ -997,22 +998,22 @@ class Login extends React.Component {
   render() {
     return (
       <div>
-        <form onSubmit={this.handleSubmit}>
+        <form onSubmit={() => handleSubmit()}>
           <h1>Login</h1>
           <label>Username</label>
           <input
             type="text"
             name="username"
             autoComplete="off"
-            value={this.state.username}
-            onChange={this.handleChange}
+            value={formData.username}
+            onChange={() => handleChange()}
           />
           <label>Password</label>
           <input
             type="password"
             name="password"
-            value={this.state.password}
-            onChange={this.handleChange}
+            value={formData.password}
+            onChange={() => handleChange()}
             autoComplete="current-password"
           />
           <input type="submit" value="Login" />
@@ -1023,8 +1024,8 @@ class Login extends React.Component {
           <GoogleLogin
             clientId={process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID}
             buttonText="Login"
-            onSuccess={this.handleGoogleLogin}
-            onFailure={this.handleGoogleLogin}
+            onSuccess={handleGoogleLogin}
+            onFailure={handleGoogleLogin}
             cookiePolicy={"single_host_origin"}
           />
         </div>
