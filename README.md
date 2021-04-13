@@ -936,17 +936,17 @@ We'll use this to display a Google sign in button and handle logic for
 authenticating the user with Google. Update the `<Login>` component like this:
 
 ```jsx
-import React from "react";
+import React, { useState } from "react";
 import { GoogleLogin } from "react-google-login";
 
-class Login extends React.Component {
-  state = {
+function Login({ handleLogin }) {
+  const [formData, setFormData] = useState({
     username: "",
     password: "",
-  };
+  });
 
   // new code!
-  handleGoogleLogin = (response) => {
+  function handleGoogleLogin(response) {
     // we'll get a tokenId back from Google on successful login that we'll send to our server to find/create a user
     if (response.tokenId) {
       fetch("http://localhost:3000/google_login", {
@@ -961,20 +961,20 @@ class Login extends React.Component {
           console.log(data);
           const { user, token } = data;
           // then set that user in state in our App component
-          this.props.handleLogin(user);
+          handleLogin(user);
           // also save the id to localStorage
           localStorage.token = token;
         });
     }
-  };
+  }
 
   // old code
-  handleChange = (e) => {
-    this.setState({ [e.target.name]: e.target.value });
-  };
+  function handleChange(e) {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  }
 
   // old code
-  handleSubmit = (e) => {
+  function handleSubmit(e) {
     e.preventDefault();
     fetch("http://localhost:3000/login", {
       method: "POST",
@@ -988,49 +988,47 @@ class Login extends React.Component {
         console.log(data);
         const { user, token } = data;
         // then set that user in state in our App component
-        this.props.handleLogin(user);
+        handleLogin(user);
         // also save the id to localStorage
         localStorage.token = token;
       });
-  };
-
-  render() {
-    return (
-      <div>
-        <form onSubmit={this.handleSubmit}>
-          <h1>Login</h1>
-          <label>Username</label>
-          <input
-            type="text"
-            name="username"
-            autoComplete="off"
-            value={this.state.username}
-            onChange={this.handleChange}
-          />
-          <label>Password</label>
-          <input
-            type="password"
-            name="password"
-            value={this.state.password}
-            onChange={this.handleChange}
-            autoComplete="current-password"
-          />
-          <input type="submit" value="Login" />
-        </form>
-        <hr />
-        <div>
-          {/* this is the new component that will help with Google sign in */}
-          <GoogleLogin
-            clientId={process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID}
-            buttonText="Login"
-            onSuccess={this.handleGoogleLogin}
-            onFailure={this.handleGoogleLogin}
-            cookiePolicy={"single_host_origin"}
-          />
-        </div>
-      </div>
-    );
   }
+
+  return (
+    <div>
+      <form onSubmit={handleSubmit}>
+        <h1>Login</h1>
+        <label>Username</label>
+        <input
+          type="text"
+          name="username"
+          autoComplete="off"
+          value={formData.username}
+          onChange={handleChange}
+        />
+        <label>Password</label>
+        <input
+          type="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          autoComplete="current-password"
+        />
+        <input type="submit" value="Login" />
+      </form>
+      <hr />
+      <div>
+        {/* this is the new component that will help with Google sign in */}
+        <GoogleLogin
+          clientId={process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID}
+          buttonText="Login"
+          onSuccess={handleGoogleLogin}
+          onFailure={handleGoogleLogin}
+          cookiePolicy={"single_host_origin"}
+        />
+      </div>
+    </div>
+  );
 }
 
 export default Login;
@@ -1043,8 +1041,7 @@ That's it for the frontend! The backend will take more work to set up.
 First, we'll need to install a couple gems:
 
 ```sh
-bundle add google-id-token
-bundle add dotenv-rails
+bundle add google-id-token dotenv-rails
 ```
 
 Next, create a `.env` file in the root of your project directory and add the Google client ID:
@@ -1068,7 +1065,7 @@ Next, add a route for handling the Google login request:
 post "/google_login", to: "users#google_login"
 ```
 
-Then, update your `UserController` to handle this request:
+Then, update your `UsersController` to handle this request:
 
 ```rb
 # app/controllers/user_controller.rb
